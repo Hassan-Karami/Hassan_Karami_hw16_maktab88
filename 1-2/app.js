@@ -7,7 +7,7 @@ const employeeRouter = require("./routes/employeeRouter");
 const app = express();
 const mongoose = require("mongoose");
 //connect mongoose to mongodb database
-mongoose.connect("mongodb://127.0.0.1:27017/employeeOfCompanyDB").then(()=>console.log(" Database is connected")).catch((err)=>console.log(err));
+mongoose.connect("mongodb://127.0.0.1:27017/company").then(()=>console.log(" Database is connected")).catch((err)=>console.log(err));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
