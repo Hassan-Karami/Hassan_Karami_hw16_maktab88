@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const {Schema, model} = mongoose;
+const { Schema, model } = mongoose;
 employeeSchema = new Schema(
   {
     first_name: {
@@ -27,7 +27,7 @@ employeeSchema = new Schema(
       trim: true,
     },
     phone_number: [
-      { type: String, required: true, validate: /^(\+98|0)?9\d{9}$/ },
+      { unique: true,type: String, required: true, validate: /^(\+98|0)?9\d{9}$/ },
     ],
     national_code: {
       required: true,
@@ -80,7 +80,7 @@ employeeSchema = new Schema(
       max: 40,
     },
     role: {
-      type:String,
+      type: String,
       enum: ["Employee", "Manager"],
       default: "Employee",
     },
@@ -90,4 +90,4 @@ employeeSchema = new Schema(
   }
 );
 
-module.exports=  model("Employee",employeeSchema);
+module.exports = model("Employee", employeeSchema);

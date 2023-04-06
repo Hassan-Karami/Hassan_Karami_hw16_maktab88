@@ -23,4 +23,9 @@ const createEmployee= (req,res,next)=>{
 }
 
 
-module.exports= {createEmployee}
+const updateEmployee = (req,res,next)=>{
+    res.status(200).send("Data saved successfully")
+}
+
+
+module.exports= {createEmployee,updateEmployee}
