@@ -1,5 +1,7 @@
 const createError = require("http-errors");
+const mongoose= require("mongoose")
 const Employee = require("../models/employeeModel");
+const e = require("express");
 const genderValidateInputs = ["Male", "Female", "Not_Set"];
 const provinceValidateInputs = [
   "Alborz",
@@ -154,13 +156,28 @@ const createEmployeeValidation = async (req, res, next) => {
   }
 };
 
+
+
+
 //UpdateEmployee Validation
+
 const updateEmployeeValidation = async (req, res, next) => {
+
+
   try {
-    if (Object.keys(req.body).length === 0) {
+    const filter = req.body[0];
+    //filter validation
+    if (!mongoose.isValidObjectId(filter)) {
+      return next(createError(400, "Invalid ObjectId"));
+    }
+    if (typeof filter != "string") {
+      return next(createError(400, "ObjectId must be string"));
+    }
+
+    if (Object.keys(req.body[1]).length === 0) {
       return next(createError(400, "empty body is invalid!"));
     }
-    if (Object.keys(req.body).length > allInputs.length) {
+    if (Object.keys(req.body[1]).length > allInputs.length) {
       return next(
         createError(
           400,
@@ -169,16 +186,16 @@ const updateEmployeeValidation = async (req, res, next) => {
       );
     }
     //type object
-    if (typeof req.body !== "object" || Array.isArray(req.body)) {
+    if (typeof req.body[1] !== "object" || Array.isArray(req.body[1])) {
       return next(createError(400, "type of body must object"));
     }
     //empty object
-    if (Object.keys(req.body).length === 0) {
+    if (Object.keys(req.body[1]).length === 0) {
       return next(createError(400, "data body is empty"));
     }
     //not allowed fields
     let notValidSentFields = [];
-    Object.keys(req.body).forEach((property) => {
+    Object.keys(req.body[1]).forEach((property) => {
       if (!allInputs.includes(property)) {
         notValidSentFields.push(property);
       }
@@ -190,35 +207,89 @@ const updateEmployeeValidation = async (req, res, next) => {
     }
     if (notValidSentFields.length > 1) {
       return next(
-        createError(400, `[${notValidSentFields.join(",")}] is not valid!`)
+        createError(400, `[${notValidSentFields.join(",")}] are not valid!`)
       );
     }
 
     //enum fields
-    if (!genderValidateInputs.includes(req.body.gender)) {
+    if (
+      req.body[1].gender &&
+      !genderValidateInputs.includes(req.body[1].gender)
+    ) {
       return next(createError(400, "invalid gender!"));
     }
-    if (!provinceValidateInputs.includes(req.body.province)) {
+    if (
+      req.body[1].province &&
+      !provinceValidateInputs.includes(req.body[1].province)
+    ) {
       return next(createError(400, "invalid province!"));
     }
-    if (!roleValidateInputs.includes(req.body.role)) {
+    if (req.body[1].role && !roleValidateInputs.includes(req.body[1].role)) {
       return next(createError(400, "invalid role!"));
     }
 
     //empty values or space values
 
     if (
-      Object.keys(req.body).find(
-        (property) => String(req.body[property])?.trim() === ""
+      Object.keys(req.body[1]).find(
+        (property) => String(req.body[1][property])?.trim() === ""
       )
     ) {
-      return next(createError(400, "empty fileds are not valid"));
+      return next(createError(400, "empty fields are not valid"));
     }
+
+    //national_code regex
+    if (!!req.body[1].national_code) {
+      const ncode = req.body[1].national_code;
+      if (!ncode.match(/^[0-9]{10}$/)) {
+        return next(createError(400, "Invalid national_code"));
+      }
+    }
+
+    //duplicate national_code
+    const duplicate = await Employee.findOne({
+      national_code: req.body[1].national_code,
+    });
+    if (!!duplicate)
+      return next(createError(400, "this national_code already exist!"));
 
     next();
   } catch (error) {
-    console.log(error);
+    next(next(createError(500,"something went wrong during updating")))
   }
 };
 
-module.exports = { createEmployeeValidation, updateEmployeeValidation };
+
+
+const deleteEmployeeValidation = (req,res,next)=>{
+  const id = req.body.id;
+  if(!id){
+    return next(createError(400,"id is required for deleting an employee"));
+  }
+  //filter validation
+  if (!mongoose.isValidObjectId(id)) {
+    return next(createError(400, "Invalid id(ObjectId)"));
+  }
+  if (typeof id != "string") {
+    return next(createError(400, "id(ObjectId) must be string"));
+  }
+
+  next();
+}
+
+const getSingleEmployeeValidation = (req,res,next)=>{
+ const id = req.body.id;
+ if (!id) {
+   return next(createError(400, "id is required for finding an employee"));
+ }
+ //filter validation
+ if (!mongoose.isValidObjectId(id)) {
+   return next(createError(400, "Invalid id(ObjectId)"));
+ }
+ if (typeof id != "string") {
+   return next(createError(400, "id(ObjectId) must be string"));
+ } 
+  next();
+}
+
+module.exports = { createEmployeeValidation, updateEmployeeValidation , deleteEmployeeValidation,getSingleEmployeeValidation};

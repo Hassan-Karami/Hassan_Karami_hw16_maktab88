@@ -18,7 +18,11 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/employee",employeeRouter);
-
+//All Employees List route
+app.get("/employees-list",(req,res)=>{
+    // res.render("./employees-list");
+    res.sendFile(path.join(__dirname,"./views/employees-list.html"))
+})
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
