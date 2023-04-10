@@ -23,6 +23,11 @@ app.get("/employees-list",(req,res)=>{
     // res.render("./employees-list");
     res.sendFile(path.join(__dirname,"./views/employees-list.html"))
 })
+//More_Info page route
+app.get("/more-info", (req,res)=>{
+  res.sendFile(path.join(__dirname,"/views/more-info.html"))
+  
+})
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

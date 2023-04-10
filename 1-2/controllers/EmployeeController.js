@@ -1,4 +1,4 @@
-const { query } = require("express");
+
 const Employee = require("../models/employeeModel");
 const createError = require("http-errors");
 const mongoose= require("mongoose")
@@ -7,7 +7,7 @@ const path= require("path")
 const getAllEmployees= async (req,res,next)=>{
     try {
         const allEmployees =await Employee.find({},{"__v":0});
-        res.send(allEmployees);
+        res.status(200).send(allEmployees);
                 
     } catch (error) {
         next(createError(500,`${error.message}`));
@@ -15,13 +15,15 @@ const getAllEmployees= async (req,res,next)=>{
         
     }
 }
+
+
 //GET single employee
 const getSingleEmployee= async(req,res,next)=>{
     try {
         const id= new mongoose.Types.ObjectId(req.body.id);
-        const targetEmployee = await Employee.findOne(id);
+        const targetEmployee = await Employee.findOne(id,{"__v":0});
         if(targetEmployee){
-            res.send(targetEmployee);
+            res.status(200).send(targetEmployee);
         }
         
     } catch (error) {
@@ -44,9 +46,9 @@ const createEmployee = async (req, res, next) => {
   });
   newEmployee
     .save()
-    .then((savedEmployee) => {
-      return res.json(savedEmployee);
-    })
+    .then((savedEmployee) =>{
+      res.status(201).send(savedEmployee);
+    } )
     .catch((err) => {
       return next(createError(500, err.message));
     });
@@ -60,8 +62,11 @@ const updateEmployee = async (req, res, next) => {
       req.body[1], {new:true}
     );
 
-    res.send(targetEmployee);
-
+    console.log(targetEmployee);
+    if(!!targetEmployee){
+      res.status(200).send(targetEmployee);
+    }
+    
     
   } catch (error) {
     next(createEmployee(500, "an Error occured during saving data(update data)"));
@@ -75,7 +80,10 @@ const deleteEmployee= async (req,res,next)=>{
      const deletedEmployee = await Employee.findByIdAndDelete(id, {
        new: true,
      });
-     res.send(deletedEmployee);
+     if(!!deleteEmployee){
+      res.status(202).send(deletedEmployee);
+     }
+     
     
    } catch (error) {
      next(createError(500, "an error occured during deleting data(delete employee)"))

@@ -11,8 +11,9 @@ const {
 const {createEmployeeValidation,updateEmployeeValidation, deleteEmployeeValidation,getSingleEmployeeValidation} = require("../validation/employeeValidation")
 
 //routes
+// router.get("/",getSingleEmployeeWithQueryString)
 router.get("/",getAllEmployees)
-router.post("/",getSingleEmployeeValidation,getSingleEmployee)
+router.post("/getSingleEmployee",getSingleEmployeeValidation,getSingleEmployee)
 router.post("/",createEmployeeValidation,createEmployee);
 router.patch("/",updateEmployeeValidation,updateEmployee);
 router.delete("/",deleteEmployeeValidation,deleteEmployee)

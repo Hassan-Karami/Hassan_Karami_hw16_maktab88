@@ -22,15 +22,16 @@ $(() => {
                 <td>${age}</td>
                 <td>${data[i].company}</td>
                 <td>${data[i].province}</td>
-                <td><button onclick="HandleMoreInfoButtonOnClick()" type="button" class="btn btn-primary">More Info</button></td>
+                <td><button onclick="HandleMoreInfoButtonOnClick('${data[i]._id}')" type="button" class="btn btn-primary">More Info</button></td>
                 </tr>
                 `
         );
       }
     },
   });
-this.HandleMoreInfoButtonOnClick = () => {
-  window.location.href= "https://google.com"
+this.HandleMoreInfoButtonOnClick = (id) => {
+  window.location.href = `http://localhost:4000/more-info?id=${id}`;
+  
 };
 
 })();

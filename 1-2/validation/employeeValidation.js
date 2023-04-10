@@ -156,9 +156,6 @@ const createEmployeeValidation = async (req, res, next) => {
   }
 };
 
-
-
-
 //UpdateEmployee Validation
 
 const updateEmployeeValidation = async (req, res, next) => {
@@ -210,14 +207,32 @@ const updateEmployeeValidation = async (req, res, next) => {
         createError(400, `[${notValidSentFields.join(",")}] are not valid!`)
       );
     }
+  
 
-    //enum fields
-    if (
-      req.body[1].gender &&
-      !genderValidateInputs.includes(req.body[1].gender)
-    ) {
-      return next(createError(400, "invalid gender!"));
+    //phone_number regex
+    if(!!req.body[1].phone_number){
+      if (!Array.isArray(req.body[1].phone_number)){
+      return next(createError(400,"phone numbers must be in array"));
     }
+      if(req.body[1].phone_number.length===0){
+        return next(createError(400, "at least one phone number must be imported!"));
+      }
+      const notValidPhone= req.body[1].phone_number.find(phone=>{
+         return !(phone.match(/^(\+98|0)?9\d{9}$/));
+      })
+      
+      if(notValidPhone){
+        return next(createError(400,`phone number ${notValidPhone} is not valid!`))
+      }
+    }
+    //gender valid inputs validation
+      if (
+        req.body[1].gender &&
+        !genderValidateInputs.includes(req.body[1].gender)
+      ) {
+        //enum fields
+        return next(createError(400, "invalid gender!"));
+      }
     if (
       req.body[1].province &&
       !provinceValidateInputs.includes(req.body[1].province)
@@ -246,16 +261,21 @@ const updateEmployeeValidation = async (req, res, next) => {
       }
     }
 
-    //duplicate national_code
+    // duplicate national_code
     const duplicate = await Employee.findOne({
       national_code: req.body[1].national_code,
     });
-    if (!!duplicate)
-      return next(createError(400, "this national_code already exist!"));
+    
+    // if (!!duplicate){
+    //   const duplicateId= duplicate._id.valueOf();
+    //   if(duplicateId == )
+    //   // return next(createError(400, "this national_code already exist!"));
+    // }
+      
 
     next();
   } catch (error) {
-    next(next(createError(500,"something went wrong during updating")))
+    next(next(createError(500,`something went wrong during updating=> ${error.message}`)))
   }
 };
 
